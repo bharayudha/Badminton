@@ -1,0 +1,15 @@
+@extends('layouts.app')
+@section('title', 'Data Pemain')
+@section('breadcrumb', 'Data pemain')
+@section('content')
+<div class="page-heading"><div><span class="eyebrow">DIREKTORI</span><h1>Data pemain</h1><p>Kelola informasi dan pengalaman para pemain.</p></div><a class="btn btn-primary" href="{{ route('players.create') }}"><i class="bi bi-plus-lg me-1"></i> Tambah pemain</a></div>
+<section class="panel table-panel">
+    <form method="GET" class="table-toolbar"><div class="search-box"><i class="bi bi-search"></i><input name="search" value="{{ request('search') }}" placeholder="Cari nama pemain..." aria-label="Cari nama pemain"></div><select class="form-select filter-select" name="level" aria-label="Filter level"><option value="">Semua level</option>@foreach(['pemula' => 'Pemula', 'menengah' => 'Menengah', 'mahir' => 'Mahir', 'belum_mengetahui' => 'Belum mengetahui'] as $value => $label)<option value="{{ $value }}" @selected(request('level') === $value)>{{ $label }}</option>@endforeach</select><button class="btn btn-outline-secondary">Terapkan</button>@if(request()->hasAny(['search','level']))<a class="btn btn-light" href="{{ route('players.index') }}">Reset</a>@endif</form>
+    <div class="table-responsive"><table class="table align-middle data-table"><thead><tr><th>Pemain</th><th>Kontak</th><th>Level</th><th>Pengalaman</th><th>Frekuensi</th><th class="text-end">Aksi</th></tr></thead><tbody>
+    @forelse($players as $player)
+        <tr><td><div class="player-cell"><span class="avatar">{{ strtoupper(substr($player->user->name, 0, 1)) }}</span><span><strong>{{ $player->user->name }}</strong><small>{{ $player->user->email }}</small></span></div></td><td>{{ $player->phone ?: '—' }}</td><td><span class="level-badge level-{{ $player->skill_level }}">{{ str_replace('_', ' ', ucfirst($player->skill_level)) }}</span></td><td>{{ $player->experience?->experience_years ? $player->experience->experience_years.' tahun' : '—' }}</td><td>{{ $player->experience?->weekly_frequency ?? 0 }}x / minggu</td><td><div class="table-actions"><a href="{{ route('players.show', $player) }}" class="icon-button" title="Detail"><i class="bi bi-eye"></i></a><a href="{{ route('players.edit', $player) }}" class="icon-button" title="Edit"><i class="bi bi-pencil"></i></a><form method="POST" action="{{ route('players.destroy', $player) }}" data-confirm="Hapus pemain {{ $player->user->name }}? Akun dan data pemainnya juga akan dihapus.">@csrf @method('DELETE')<button class="icon-button text-danger" title="Hapus"><i class="bi bi-trash3"></i></button></form></div></td></tr>
+    @empty<tr><td colspan="6"><div class="empty-state"><span class="empty-icon"><i class="bi bi-people"></i></span><strong>Belum ada data pemain</strong><p>Tambahkan pemain atau ubah filter pencarian.</p></div></td></tr>@endforelse
+    </tbody></table></div>
+    <div class="table-footer"><span>Menampilkan {{ $players->firstItem() ?? 0 }}–{{ $players->lastItem() ?? 0 }} dari {{ $players->total() }} pemain</span>{{ $players->links() }}</div>
+</section>
+@endsection

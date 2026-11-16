@@ -1,58 +1,58 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Pengaturan Partner Badminton
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi web untuk membantu pengelola badminton mengelola pemain dan menyiapkan sesi pencarian partner atau pembagian tim.
 
-## About Laravel
+## Persyaratan
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.3 atau lebih baru dengan ekstensi `pdo_mysql`
+- Composer
+- MySQL 8 atau MariaDB yang kompatibel
+- Node.js dan npm
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Menjalankan secara lokal
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. Salin `.env.example` ke `.env`, lalu isi koneksi database MySQL:
 
-## Learning Laravel
+   ```dotenv
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=badminton
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+2. Buat database `badminton` di MySQL, kemudian jalankan:
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+   ```bash
+   composer install
+   php artisan key:generate
+   php artisan migrate
+   npm install
+   npm run build
+   php artisan serve
+   ```
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+3. Buka alamat yang ditampilkan oleh `php artisan serve`.
+4. Untuk membuat akun contoh, atur `SEED_ADMIN_PASSWORD` pada `.env`, lalu jalankan `php artisan db:seed`. Akun admin menggunakan `SEED_ADMIN_EMAIL`; empat akun pemain contoh memakai kata sandi `password` dan hanya untuk pengembangan lokal.
 
-## Agentic Development
+Untuk pemeriksaan otomatis, jalankan `php artisan test`. Konfigurasi tes menggunakan SQLite in-memory sehingga tidak memerlukan database MySQL.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Fitur saat ini
 
-```bash
-composer require laravel/boost --dev
+- Login, registrasi pemain, logout, dan pembatasan akses role.
+- Dashboard ringkas dan aktivitas sesi terbaru.
+- CRUD pemain untuk admin, pencarian nama, filter level, dan pagination.
+- Profil pemain mandiri serta manajemen role pengguna oleh admin.
+- Pembuatan sesi partner atau pembagian dua tim ganda, hasil, dan riwayat.
+- Skor prioritas terpisah dari aturan pengelompokan; bobot level/pengalaman ditentukan pada setiap sesi dan harus berjumlah 100%.
+- Aturan pengelompokan awal ditampilkan secara eksplisit; hasil bukan klaim pasangan optimal.
 
-php artisan boost:install
-```
+## Skema awal
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+- `users` menyimpan akun dan role (`admin` atau `pemain`).
+- `players` menyimpan profil badminton, level pilihan pemain, dan nomor telepon.
+- `player_experiences` menyimpan durasi, frekuensi bermain, serta pengalaman latihan/klub dan kompetisi.
+- `pairing_sessions` dan `pairing_results` menyimpan sesi dan hasil yang dapat dikembangkan untuk Weighted Scoring + Sorting.
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Bobot kriteria dan aturan pencocokan belum ditetapkan. Aplikasi tidak menilai level pemain secara otomatis.
